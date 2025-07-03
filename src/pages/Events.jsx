@@ -84,24 +84,25 @@ function Events() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
-      {/* 🔙 Back to Dashboard */}
+      {/* Back to Dashboard */}
       <button
         onClick={() => navigate('/dashboard')}
-        className="mb-6 bg-blue-500 text-white px-4 py-2 rounded"
+        className="mb-6 text-blue-600 hover:text-blue-800 font-medium"
       >
         ← Back to Dashboard
       </button>
 
-      <h2 className="text-2xl font-bold mb-4">🎉 Plan an Event</h2>
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">🎉 Plan an Event</h2>
 
-      <form onSubmit={handleSubmit} className="space-y-4 mb-8 max-w-xl">
+      {/* Event Form */}
+      <form onSubmit={handleSubmit} className="bg-white shadow-md rounded-xl p-6 mb-10 max-w-2xl space-y-4">
         <input
           type="text"
           placeholder="Event Title"
           required
           value={formData.title}
           onChange={e => setFormData({ ...formData, title: e.target.value })}
-          className="w-full px-4 py-2 border rounded"
+          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
 
         <input
@@ -109,7 +110,7 @@ function Events() {
           required
           value={formData.date}
           onChange={e => setFormData({ ...formData, date: e.target.value })}
-          className="w-full px-4 py-2 border rounded"
+          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
 
         <input
@@ -118,60 +119,81 @@ function Events() {
           required
           value={formData.totalBudget}
           onChange={e => setFormData({ ...formData, totalBudget: e.target.value })}
-          className="w-full px-4 py-2 border rounded"
+          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
 
-        <h4 className="font-semibold">Category Breakdown:</h4>
-        {formData.categories.map((cat, i) => (
-          <div key={i} className="grid grid-cols-2 gap-2">
-            <input
-              type="text"
-              placeholder="Category"
-              value={cat.name}
-              onChange={e => handleChange(i, 'name', e.target.value)}
-              className="px-3 py-2 border rounded"
-            />
-            <input
-              type="number"
-              placeholder="Amount"
-              value={cat.amount}
-              onChange={e => handleChange(i, 'amount', e.target.value)}
-              className="px-3 py-2 border rounded"
-            />
-          </div>
-        ))}
+        <div>
+          <h4 className="font-semibold text-gray-700">📊 Category Breakdown</h4>
+          {formData.categories.map((cat, i) => (
+            <div key={i} className="grid grid-cols-2 gap-2 my-2">
+              <input
+                type="text"
+                placeholder="Category"
+                value={cat.name}
+                onChange={e => handleChange(i, 'name', e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-400"
+              />
+              <input
+                type="number"
+                placeholder="Amount"
+                value={cat.amount}
+                onChange={e => handleChange(i, 'amount', e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-400"
+              />
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={addCategory}
+            className="mt-2 text-sm px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+          >
+            + Add Category
+          </button>
+        </div>
 
-        <button type="button" onClick={addCategory} className="px-4 py-2 bg-gray-200 rounded">
-          + Add Category
-        </button>
-
-        <br />
-        <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
-          Save Event
-        </button>
+        <div className="text-right">
+          <button
+            type="submit"
+            className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 font-semibold"
+          >
+            ✅ Save Event
+          </button>
+        </div>
       </form>
 
+      {/* Events List */}
       <h2 className="text-xl font-bold mb-4">📋 Your Events</h2>
 
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="grid md:grid-cols-2 gap-6">
         {events.map((ev, idx) => {
           const data = Object.entries(ev.categoryBreakdown).map(([name, value]) => ({ name, value }));
           const totalSpent = data.reduce((sum, d) => sum + d.value, 0);
           const saved = ev.totalBudget - totalSpent;
 
           return (
-            <div key={idx} className="border rounded p-4 shadow bg-white flex flex-col">
-              <h3 className="text-lg font-semibold">{ev.title}</h3>
-              <p className="text-sm text-gray-600">Date: {ev.date}</p>
-              <p>Total Budget: ₹{ev.totalBudget}</p>
-              <p>Total Spent: ₹{totalSpent}</p>
-              <p className={`font-bold ${saved >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {saved >= 0 ? `🎉 Saved ₹${saved}` : `⚠️ Overspent by ₹${-saved}`}
-              </p>
+            <div key={idx} className="bg-white rounded-xl shadow-md p-5 border-l-4 border-blue-400 flex flex-col">
+              <div className="mb-3">
+                <h3 className="text-lg font-semibold text-gray-800">{ev.title}</h3>
+                <p className="text-sm text-gray-500">📅 {ev.date}</p>
+              </div>
 
-              <div className="mt-4 flex justify-center">
-                <PieChart width={300} height={300}>
-                  <Pie data={data} dataKey="value" nameKey="name" outerRadius={100} label>
+              <div className="text-sm text-gray-700 mb-2">
+                <p>Total Budget: ₹{ev.totalBudget}</p>
+                <p>Total Spent: ₹{totalSpent}</p>
+                <p className={`font-bold ${saved >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {saved >= 0 ? `🎉 Saved ₹${saved}` : `⚠️ Overspent by ₹${-saved}`}
+                </p>
+              </div>
+
+              <div className="flex justify-center mt-4">
+                <PieChart width={260} height={260}>
+                  <Pie
+                    data={data}
+                    dataKey="value"
+                    nameKey="name"
+                    outerRadius={90}
+                    label
+                  >
                     {data.map((entry, i) => (
                       <Cell key={i} fill={COLORS[i % COLORS.length]} />
                     ))}
@@ -183,9 +205,9 @@ function Events() {
 
               <button
                 onClick={() => handleDeleteEvent(ev.id)}
-                className="mt-4 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                className="mt-4 self-end px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
               >
-                Delete Event
+                🗑️ Delete Event
               </button>
             </div>
           );
