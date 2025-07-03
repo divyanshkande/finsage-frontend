@@ -26,7 +26,8 @@ const Navbar = ({ isAuthenticated, setIsAuthenticated }) => {
             <Link to="/expenses" className="hover:text-yellow-400">Expenses</Link>
             <Link to="/events" className="hover:text-yellow-400">Events</Link>
             <Link to="/savings" className="hover:text-yellow-400">Savings</Link>
-            <Link to="/history" className="hover:text-yellow-400">History</Link>
+            
+            
             <button
               onClick={handleLogout}
               className="bg-red-500 px-3 py-1 rounded hover:bg-red-600"
@@ -36,8 +37,8 @@ const Navbar = ({ isAuthenticated, setIsAuthenticated }) => {
           </>
         ) : (
           <>
-            <Link to="/login" className="hover:text-yellow-400">Login</Link>
-            <Link to="/signup" className="hover:text-yellow-400">Sign Up</Link>
+            <Link to="/login" className="text-white hover:text-gray-300">Register / Login</Link>
+
           </>
         )}
       </div>
