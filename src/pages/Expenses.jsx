@@ -1,118 +1,187 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-export default function Expenses() {
+function Expenses() {
   const [expenses, setExpenses] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [newExpense, setNewExpense] = useState({
-    title: '',
-    amount: '',
-    category: '',
-    date: ''
+    title: "",
+    amount: "",
+    category: "",
+    date: "",
   });
+  const [selectedCategory, setSelectedCategory] = useState("All");
 
+  const token = localStorage.getItem("token");
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('http://localhost:8080/api/expenses/all', {
-      credentials: 'include'
-    })
-      .then(res => res.json())
-      .then(data => setExpenses(data));
+    fetchExpenses();
+    fetchCategories();
   }, []);
 
-  const handleAddExpense = async (e) => {
-    e.preventDefault();
-    await fetch('http://localhost:8080/api/expenses/add', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify(newExpense),
+  const fetchExpenses = async () => {
+    const res = await fetch("http://localhost:8080/api/expenses", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
     });
-    setNewExpense({ title: '', amount: '', category: '', date: '' });
-    window.location.reload();
+    if (res.ok) {
+      const data = await res.json();
+      setExpenses(data);
+    }
   };
 
+  const fetchCategories = async () => {
+    const res = await fetch("http://localhost:8080/api/categories", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+    if (res.ok) {
+      const data = await res.json();
+      setCategories(data);
+    }
+  };
+
+  const addExpense = async () => {
+    const res = await fetch("http://localhost:8080/api/expenses", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(newExpense),
+    });
+    if (res.ok) {
+      setNewExpense({ title: "", amount: "", category: "", date: "" });
+      fetchExpenses();
+    } else {
+      alert("Failed to add expense");
+    }
+  };
+
+  const deleteExpense = async (id) => {
+    await fetch(`http://localhost:8080/api/expenses/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      credentials: "include",
+    });
+    fetchExpenses();
+  };
+
+  const filteredExpenses =
+    selectedCategory === "All"
+      ? expenses
+      : expenses.filter((e) => e.category === selectedCategory);
+
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      {/* Back Button */}
+    <div className="min-h-screen bg-gray-100 p-6 space-y-8">
+      {/* 🔙 Back to Dashboard */}
       <button
-        onClick={() => navigate('/dashboard')}
+        onClick={() => navigate("/dashboard")}
         className="mb-6 text-blue-600 hover:text-blue-800 font-medium"
       >
         ← Back to Dashboard
       </button>
 
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">📄 Your Expenses</h2>
+      {/* ➕ Add Expense Form */}
+      <div className="bg-white p-6 rounded shadow max-w-2xl mx-auto space-y-4">
+        <h2 className="text-xl font-bold">➕ Add New Expense</h2>
+        <input
+          type="text"
+          placeholder="Title"
+          value={newExpense.title}
+          onChange={(e) => setNewExpense({ ...newExpense, title: e.target.value })}
+          className="w-full px-3 py-2 border rounded"
+        />
+        <input
+          type="number"
+          placeholder="Amount"
+          value={newExpense.amount}
+          onChange={(e) => setNewExpense({ ...newExpense, amount: e.target.value })}
+          className="w-full px-3 py-2 border rounded"
+        />
+        <select
+          value={newExpense.category}
+          onChange={(e) => setNewExpense({ ...newExpense, category: e.target.value })}
+          className="w-full px-3 py-2 border rounded"
+        >
+          <option value="">Select Category</option>
+          {categories.map((cat) => (
+            <option key={cat.id} value={cat.name}>
+              {cat.name}
+            </option>
+          ))}
+        </select>
+        <input
+          type="date"
+          value={newExpense.date}
+          onChange={(e) => setNewExpense({ ...newExpense, date: e.target.value })}
+          className="w-full px-3 py-2 border rounded"
+        />
+        <button
+          onClick={addExpense}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          Add Expense
+        </button>
+      </div>
 
-      {/* Add Expense Form */}
-      <form
-        className="bg-white rounded-xl shadow-md p-6 mb-8 space-y-4"
-        onSubmit={handleAddExpense}
-      >
-        <div className="grid sm:grid-cols-2 gap-4">
-          <input
-            type="text"
-            placeholder="Title"
-            value={newExpense.title}
-            onChange={e => setNewExpense({ ...newExpense, title: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-            required
-          />
-          <input
-            type="number"
-            placeholder="Amount"
-            value={newExpense.amount}
-            onChange={e => setNewExpense({ ...newExpense, amount: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-            required
-          />
-          <input
-            type="text"
-            placeholder="Category"
-            value={newExpense.category}
-            onChange={e => setNewExpense({ ...newExpense, category: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-            required
-          />
-          <input
-            type="date"
-            value={newExpense.date}
-            onChange={e => setNewExpense({ ...newExpense, date: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-            required
-          />
-        </div>
-        <div className="text-right">
-          <button
-            type="submit"
-            className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg font-semibold transition"
-          >
-            ➕ Add Expense
-          </button>
-        </div>
-      </form>
+      {/* 📂 Filter by Category */}
+      <div className="max-w-2xl mx-auto">
+        <select
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value)}
+          className="px-3 py-2 border rounded mb-4"
+        >
+          <option>All</option>
+          {categories.map((cat) => (
+            <option key={cat.id} value={cat.name}>
+              {cat.name}
+            </option>
+          ))}
+        </select>
+      </div>
 
-      {/* Expense List */}
-      <div className="space-y-4">
-        {expenses.length === 0 ? (
-          <p className="text-gray-600">No expenses recorded yet.</p>
+      {/* 📋 Expenses List */}
+      <div className="bg-white p-6 rounded shadow max-w-4xl mx-auto">
+        <h3 className="text-xl font-semibold mb-4">📋 Expense History</h3>
+        {filteredExpenses.length === 0 ? (
+          <p className="text-gray-500">No expenses yet.</p>
         ) : (
-          expenses.map((exp, idx) => (
-            <div
-              key={idx}
-              className="bg-white shadow-sm rounded-lg p-4 border-l-4 border-blue-400 flex justify-between items-center"
-            >
-              <div>
-                <h3 className="text-lg font-semibold text-gray-800">{exp.title}</h3>
-                <p className="text-sm text-gray-500">
-                  {exp.category} • {exp.date || "No date"}
-                </p>
-              </div>
-              <p className="text-lg font-bold text-red-600">₹{exp.amount}</p>
-            </div>
-          ))
+          <ul className="space-y-4">
+            {filteredExpenses.map((expense) => (
+              <li
+                key={expense.id}
+                className="bg-gray-100 p-4 rounded flex justify-between items-center"
+              >
+                <div>
+                  <p className="font-medium">{expense.title}</p>
+                  <p className="text-sm text-gray-600">
+                    ₹{expense.amount} • {expense.category} • {expense.date}
+                  </p>
+                </div>
+                <button
+                  onClick={() => deleteExpense(expense.id)}
+                  className="text-red-500 hover:underline"
+                >
+                  Delete
+                </button>
+              </li>
+            ))}
+          </ul>
         )}
       </div>
     </div>
   );
 }
+
+export default Expenses;

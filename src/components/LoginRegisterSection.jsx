@@ -37,16 +37,16 @@ export default function LoginRegisterSection() {
 
   return (
     <div
-      className="min-h-screen w-full bg-cover bg-center flex items-center justify-center relative"
+      className="min-h-screen w-full bg-cover bg-center flex items-center justify-center px-4 relative"
       style={{
-        backgroundImage: `url('/login-bg.jpg')`, // ✅ Your full background .jpg image
+        backgroundImage: `url('/login-bg.jpg')`,
       }}
     >
-      {/* Optional overlay to darken background */}
+      {/* Dark overlay */}
       <div className="absolute inset-0 bg-black bg-opacity-50 z-0" />
 
-      {/* Glassmorphism Form */}
-      <div className="relative z-10 bg-white bg-opacity-20 backdrop-blur-md rounded-2xl shadow-xl p-8 w-full max-w-md mx-4">
+      {/* Glassmorphism Box */}
+      <div className="relative z-10 bg-white bg-opacity-20 backdrop-blur-md rounded-2xl shadow-xl p-6 sm:p-8 w-full max-w-md">
         <h3 className="text-3xl font-semibold text-center text-white mb-6">
           {isLogin ? "Login to Finsage" : "Create Your Account"}
         </h3>

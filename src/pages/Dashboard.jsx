@@ -3,7 +3,6 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip,
   PieChart, Pie, Cell, Legend, ResponsiveContainer
 } from 'recharts';
-import { filterExpenses } from '../services/expenseService';
 import { useNavigate } from 'react-router-dom';
 
 const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7f50', '#00bcd4'];
@@ -14,8 +13,6 @@ function Dashboard() {
   const [monthlyData, setMonthlyData] = useState([]);
   const [categoryData, setCategoryData] = useState([]);
   const [summary, setSummary] = useState(null);
-  
-
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -23,24 +20,18 @@ function Dashboard() {
     fetchMonthlySummary();
     fetchCategorySummary();
     fetchSummary();
-    
   }, []);
 
   const fetchExpenses = async () => {
-    try {
-      const res = await fetch("http://localhost:8080/api/expenses/all", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json"
-        },
-        credentials: "include"
-      });
-      if (!res.ok) throw new Error(`Status ${res.status}`);
-      const data = await res.json();
-      setExpenses(data);
-    } catch (err) {
-      console.error("Error fetching expenses:", err.message);
-    }
+    const res = await fetch("http://localhost:8080/api/expenses/all", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      credentials: "include"
+    });
+    const data = await res.json();
+    setExpenses(data);
   };
 
   const deleteExpense = async (id) => {
@@ -56,79 +47,61 @@ function Dashboard() {
   };
 
   const fetchMonthlySummary = async () => {
-    try {
-      const res = await fetch("http://localhost:8080/api/expenses/summary/monthly", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json"
-        },
-        credentials: "include"
-      });
-      if (!res.ok) throw new Error(`Status ${res.status}`);
-      const json = await res.json();
-      const transformed = Object.entries(json).map(([month, amount]) => ({ month, amount }));
-      setMonthlyData(transformed);
-    } catch (err) {
-      console.error("Error fetching monthly summary:", err.message);
-    }
+    const res = await fetch("http://localhost:8080/api/expenses/summary/monthly", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      credentials: "include"
+    });
+    const json = await res.json();
+    const transformed = Object.entries(json).map(([month, amount]) => ({ month, amount }));
+    setMonthlyData(transformed);
   };
 
   const fetchCategorySummary = async () => {
-    try {
-      const res = await fetch("http://localhost:8080/api/expenses/summary/category", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json"
-        },
-        credentials: "include"
-      });
-      if (!res.ok) throw new Error(`Status ${res.status}`);
-      const json = await res.json();
-      const transformed = Object.entries(json).map(([category, amount]) => ({
-        name: category,
-        value: amount
-      }));
-      setCategoryData(transformed);
-    } catch (err) {
-      console.error("Error fetching category summary:", err.message);
-    }
+    const res = await fetch("http://localhost:8080/api/expenses/summary/category", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      credentials: "include"
+    });
+    const json = await res.json();
+    const transformed = Object.entries(json).map(([category, amount]) => ({
+      name: category,
+      value: amount
+    }));
+    setCategoryData(transformed);
   };
 
   const fetchSummary = async () => {
-    try {
-      const res = await fetch("http://localhost:8080/api/expenses/summary", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json"
-        },
-        credentials: "include"
-      });
-      if (!res.ok) throw new Error(`Status ${res.status}`);
-      const data = await res.json();
-      setSummary(data);
-    } catch (err) {
-      console.error("Error fetching summary:", err.message);
-    }
+    const res = await fetch("http://localhost:8080/api/expenses/summary", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      credentials: "include"
+    });
+    const data = await res.json();
+    setSummary(data);
   };
 
-  
-
   return (
-    <div className="min-h-screen bg-gray-100 p-6 space-y-6">
-
-      {/* Header and Navigation Buttons */}
-      <div className="flex flex-wrap justify-between items-center mb-4">
-        <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
-        <div className="space-x-2 mt-2 sm:mt-0">
-          <button onClick={() => navigate('/savings')} className="bg-blue-500 text-white px-4 py-2 rounded">Savings</button>
-          <button onClick={() => navigate('/events')} className="bg-green-500 text-white px-4 py-2 rounded">Events</button>
-          <button onClick={() => navigate('/expenses')} className="bg-purple-500 text-white px-4 py-2 rounded">Expenses</button>
+    <div className="min-h-screen bg-gray-100 p-4 sm:p-6 space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Dashboard</h1>
+        <div className="flex flex-wrap justify-center sm:justify-end gap-2 mt-4 sm:mt-0">
+          <button onClick={() => navigate('/savings')} className="btn bg-blue-500">Savings</button>
+          <button onClick={() => navigate('/events')} className="btn bg-green-500">Events</button>
+          <button onClick={() => navigate('/expenses')} className="btn bg-purple-500">Expenses</button>
         </div>
       </div>
 
-      {/* Summary Cards */}
+      {/* Summary */}
       {summary && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           <div className="bg-white p-4 shadow rounded text-center">
             <p className="text-gray-500">Total Income</p>
             <p className="text-2xl font-bold text-green-600">₹{summary.totalIncome}</p>
@@ -144,10 +117,10 @@ function Dashboard() {
         </div>
       )}
 
-      {/* Charts Layout - Two Columns */}
+      {/* Charts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white p-4 shadow rounded h-[350px]">
-          <h3 className="text-xl font-semibold mb-3">📅 Monthly Expenses</h3>
+        <div className="bg-white p-4 shadow rounded h-[300px] sm:h-[350px]">
+          <h3 className="text-lg sm:text-xl font-semibold mb-3">📅 Monthly Expenses</h3>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={monthlyData}>
               <XAxis dataKey="month" />
@@ -158,8 +131,8 @@ function Dashboard() {
           </ResponsiveContainer>
         </div>
 
-        <div className="bg-white p-4 shadow rounded h-[350px]">
-          <h3 className="text-xl font-semibold mb-3">📊 Category-wise Breakdown</h3>
+        <div className="bg-white p-4 shadow rounded h-[300px] sm:h-[350px]">
+          <h3 className="text-lg sm:text-xl font-semibold mb-3">📊 Category-wise Breakdown</h3>
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -173,18 +146,17 @@ function Dashboard() {
                   <Cell key={index} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
-              <Legend />
               <Tooltip />
+              <Legend />
             </PieChart>
           </ResponsiveContainer>
         </div>
       </div>
 
-     
-      {/* Expense Table (Full Width at Bottom) */}
+      {/* Expense Table */}
       <div className="overflow-x-auto">
-        <h3 className="text-xl font-semibold mb-2 mt-4">🧾 Expenses</h3>
-        <table className="min-w-full bg-white border shadow rounded">
+        <h3 className="text-lg sm:text-xl font-semibold mb-2 mt-4">🧾 Expenses</h3>
+        <table className="min-w-full bg-white border shadow rounded text-sm sm:text-base">
           <thead className="bg-gray-100">
             <tr>
               <th className="py-2 px-4 border">Title</th>
@@ -203,7 +175,7 @@ function Dashboard() {
                 <td className="py-2 px-4 border">{exp.date}</td>
                 <td className="py-2 px-4 border">
                   <button
-                    className="bg-red-500 text-white px-3 py-1 rounded"
+                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
                     onClick={() => deleteExpense(exp.id)}
                   >
                     Delete
@@ -214,7 +186,6 @@ function Dashboard() {
           </tbody>
         </table>
       </div>
-
     </div>
   );
 }

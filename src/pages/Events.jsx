@@ -18,9 +18,7 @@ function Events() {
 
   useEffect(() => {
     fetch("http://localhost:8080/api/events", {
-      headers: {
-        Authorization: `Bearer ${token}`
-      },
+      headers: { Authorization: `Bearer ${token}` },
       credentials: 'include'
     })
       .then(res => res.json())
@@ -37,27 +35,21 @@ function Events() {
   };
 
   const addCategory = () => {
-    setFormData({
-      ...formData,
-      categories: [...formData.categories, { name: '', amount: '' }]
-    });
+    setFormData({ ...formData, categories: [...formData.categories, { name: '', amount: '' }] });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const breakdown = {};
     formData.categories.forEach(cat => {
       if (cat.name && cat.amount) breakdown[cat.name] = parseFloat(cat.amount);
     });
-
     const payload = {
       title: formData.title,
       date: formData.date,
       totalBudget: parseFloat(formData.totalBudget),
       categoryBreakdown: breakdown
     };
-
     await fetch("http://localhost:8080/api/events", {
       method: "POST",
       headers: {
@@ -67,24 +59,21 @@ function Events() {
       credentials: "include",
       body: JSON.stringify(payload)
     });
-
     window.location.reload();
   };
 
   const handleDeleteEvent = async (id) => {
     await fetch(`http://localhost:8080/api/events/${id}`, {
       method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`
-      },
+      headers: { Authorization: `Bearer ${token}` },
       credentials: "include"
     });
     setEvents(events.filter(e => e.id !== id));
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      {/* Back to Dashboard */}
+    <div className="min-h-screen bg-gray-100 p-4 sm:p-6">
+      {/* Back Button */}
       <button
         onClick={() => navigate('/dashboard')}
         className="mb-6 text-blue-600 hover:text-blue-800 font-medium"
@@ -92,6 +81,7 @@ function Events() {
         ← Back to Dashboard
       </button>
 
+      {/* Title */}
       <h2 className="text-2xl font-bold text-gray-800 mb-6">🎉 Plan an Event</h2>
 
       {/* Event Form */}
@@ -102,7 +92,7 @@ function Events() {
           required
           value={formData.title}
           onChange={e => setFormData({ ...formData, title: e.target.value })}
-          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="input"
         />
 
         <input
@@ -110,7 +100,7 @@ function Events() {
           required
           value={formData.date}
           onChange={e => setFormData({ ...formData, date: e.target.value })}
-          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="input"
         />
 
         <input
@@ -119,26 +109,26 @@ function Events() {
           required
           value={formData.totalBudget}
           onChange={e => setFormData({ ...formData, totalBudget: e.target.value })}
-          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="input"
         />
 
         <div>
           <h4 className="font-semibold text-gray-700">📊 Category Breakdown</h4>
           {formData.categories.map((cat, i) => (
-            <div key={i} className="grid grid-cols-2 gap-2 my-2">
+            <div key={i} className="grid grid-cols-1 sm:grid-cols-2 gap-2 my-2">
               <input
                 type="text"
                 placeholder="Category"
                 value={cat.name}
                 onChange={e => handleChange(i, 'name', e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-400"
+                className="input"
               />
               <input
                 type="number"
                 placeholder="Amount"
                 value={cat.amount}
                 onChange={e => handleChange(i, 'amount', e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-400"
+                className="input"
               />
             </div>
           ))}
@@ -161,9 +151,8 @@ function Events() {
         </div>
       </form>
 
-      {/* Events List */}
+      {/* Event Cards */}
       <h2 className="text-xl font-bold mb-4">📋 Your Events</h2>
-
       <div className="grid md:grid-cols-2 gap-6">
         {events.map((ev, idx) => {
           const data = Object.entries(ev.categoryBreakdown).map(([name, value]) => ({ name, value }));
