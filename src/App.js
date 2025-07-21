@@ -5,6 +5,8 @@ import Events from './pages/Events';
 import Savings from './pages/Savings';
 import LandingPage from './pages/LandingPage';
 import ProtectedRoute from './components/ProtectedRoute';
+import ForgotPassword from './components/ForgotPassword';
+import ResetPassword from './components/ResetPassword';
 
 function App() {
   return (
@@ -34,6 +36,9 @@ function App() {
             <Savings />
           </ProtectedRoute>
         } />
+
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+    <Route path="/reset-password/:token" element={<ResetPassword />} />
       </Routes>
     </Router>
   );

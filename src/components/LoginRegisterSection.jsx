@@ -52,29 +52,42 @@ export default function LoginRegisterSection() {
         </h3>
 
         <form onSubmit={handleAuth} className="space-y-4">
-          <input
-            type="email"
-            placeholder="Email"
-            className="w-full px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white bg-opacity-70"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            className="w-full px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white bg-opacity-70"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-md font-semibold hover:bg-blue-700 transition"
-          >
-            {isLogin ? "Login" : "Register"}
-          </button>
-        </form>
+  <input
+    type="email"
+    placeholder="Email"
+    className="w-full px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white bg-opacity-70"
+    value={email}
+    onChange={(e) => setEmail(e.target.value)}
+    required
+  />
+  <input
+    type="password"
+    placeholder="Password"
+    className="w-full px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white bg-opacity-70"
+    value={password}
+    onChange={(e) => setPassword(e.target.value)}
+    required
+  />
+
+  
+  {isLogin && (
+    <div className="text-right text-sm">
+      <span
+        className="text-blue-200 hover:underline cursor-pointer"
+        onClick={() => navigate("/forgot-password")}
+      >
+        Forgot Password?
+      </span>
+    </div>
+  )}
+
+  <button
+    type="submit"
+    className="w-full bg-blue-600 text-white py-2 rounded-md font-semibold hover:bg-blue-700 transition"
+  >
+    {isLogin ? "Login" : "Register"}
+  </button>
+</form>
 
         <div className="text-center text-sm text-white mt-4">
           {isLogin ? "Don't have an account?" : "Already have an account?"}
